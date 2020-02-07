@@ -8,25 +8,21 @@ import java.util.concurrent.Executors;
 public class ThreadPoolExecutor {
 
     public static void main(String[] args) {
-        List<Task> tasks = new ArrayList<>();
+        int numTasks = 100;
+        List<Task> tasks = new ArrayList<>(numTasks);
 
-        for (short i = 0; i < 5; i++) {
-            tasks.add(new Task(i, (long) i));
+        for (short i = 0; i < numTasks; i++) {
+            tasks.add(new Task(i, (long) i % 3));
         }
-
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor();
-        threadPoolExecutor.executeTasks(tasks);
-    }
-
-    public void executeTasks(List<Task> taskList) {
         ExecutorService executorService = Executors.newFixedThreadPool(5);
-        for (Task task : taskList) {
+        for (Task task : tasks) {
             executorService.execute(task);
         }
         executorService.shutdown();
     }
 
     static class Task implements Runnable {
+
 
         private final short id;
         private final long timeToExecute;
@@ -38,13 +34,14 @@ public class ThreadPoolExecutor {
 
         @Override
         public void run() {
-            System.out.println("[" + Thread.currentThread() + "] Executing task:" + id);
+            Thread currentThread = Thread.currentThread();
+            System.out.println(currentThread + " Executing task:" + id);
             try {
                 Thread.sleep(timeToExecute * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("[" + Thread.currentThread() + "] Finished executing task:" + timeToExecute);
+            System.out.println(currentThread + " Finished executing task:" + id);
         }
     }
 
